@@ -6,7 +6,7 @@ robot_radius: 0.1
 
 # inflation_radius: 0.3
 # cost_scaling_factor: 2.0
-inflation_radius: 0.5
+inflation_radius: 0.35
 cost_scaling_factor: 17.672
 
 map_type: costmap
