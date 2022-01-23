@@ -51,7 +51,7 @@ inflation_radius:
 global_frame: /map
 　　global cost map のフレーム名称
 robot_base_fame: /base_footprint
-　　TurtleBot用には /base_footprint　を使う。
+　　TurtleBot用には /base_footprint　を使う
 update_frequency: 
 　　global mapを更新する頻度
 publish_frequency: 
@@ -131,12 +131,18 @@ forward_point_distance:
 　　追加 scoreing point の場所
     base_local_plannerでいうheading_lookaheadというパラメータと同じ役割をしていると思われる
 stop_time_buffer: 
+　　ロボットが衝突前に停止するまでに必要な時間
 scaling_speed: 
+　　スケーリング速度（メートル/秒）
 max_scaling_factor: 
+    最大スケーリング要素
 
 Oscillation Prevention Parameters
 oscillation_reset_dist: 0.05
+　　オシレーションフラグがリセットされる前にロボットが移動しなければならない距離
 
 Debugging
 publish_traj_pc : true
+　　移動軌跡デバック設定
 publish_cost_grid_pc: true
+　　コストマップデバック設定
