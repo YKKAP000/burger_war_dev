@@ -1,7 +1,25 @@
 **** 2022.1.22 *****
-Navigation 関連のパラメータ一覧・説明まとめ
+Navigation パラメータまとめ
 
-(1) base_local_planner_params.yaml
+(1) move_base_params.yaml
+shutdown_costmaps:
+　　move_base が非活性化された状態のとき、costmapノードを停止するか
+controller_frequency:
+　　ロボットベースへ速度指令を下すコントロール反復周期(Hz)
+planner_patience:
+　　space-clearing が実行される前、使用可能な計画を探索するときに待機する最大時間(sec)
+controller_patience: 
+　　space-clearing が実行される前、コントローラーが制御情報を受信するために待機する最大時間(sec)
+conservative_reset_dist:
+　　復旧動作の costmap 初期化時に、この距離より遠い場所にある障害物は地図から削除される
+planner_frequency:
+　　全域計画の反復周期(Hz)
+oscillation_timeout:
+　　recovery behavior を実行する前、使用可能な計画を探索するときに待機する最大時間(sec)
+oscillation_distance: 0.2
+　　ロボットが微動しないように動く必要がある距離(m) この距離を動くと oscillation_timeoutが初期化
+
+(2) base_local_planner_params.yaml
 controller_frequency:
 　　経路のプランニングを行う周期
 max_vel_x:
@@ -37,7 +55,7 @@ sim_time:
 dwa: true
 　　Dynamic Window Approach を使うか否か
 
-(2) costmap_common_params.yaml
+(3) costmap_common_params.yaml
 robot_radius: 
 　　円形ロボットの場合、ロボットの半径（メートル）。
 　　円形で無いロボットの場合はfootprintパラメータを使う。
@@ -47,7 +65,7 @@ footprint: [[x0, y0], [x1, y1], [x2, y2], [x3, y3], etc]
 inflation_radius: 
 　　ロボットが障害物にぶつからないようにするための膨張パラメータ
 
-(3) global_costmap_params.yaml
+(4) global_costmap_params.yaml
 global_frame: /map
 　　global cost map のフレーム名称
 robot_base_fame: /base_footprint
@@ -63,7 +81,7 @@ rolling_window:
 transform_tolerance: 
 　　ネットワークの遅延に対処するための待ち時間（秒）
 
-(4) local_costmap_params.yaml
+(5) local_costmap_params.yaml
 global_frame: /odom
 　　local cost mapにおけるオドメトリのフレーム
 robot_base_fame: /base_footprint
@@ -86,7 +104,7 @@ Resolution:
 transform_tolerance: 
 　　ネットワークの遅延に対処するための待ち時間（秒）
 
-(5) dwa_local_planner_params.yaml
+(6) dwa_local_planner_params.yaml
 Robot Configuration Parameters
 max_vel_x:
 min_vel_x:
