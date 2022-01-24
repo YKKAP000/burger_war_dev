@@ -64,9 +64,9 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
         firefox \
     && rm -rf /var/lib/apt/lists/*
 
-RUN sudo apt update && sudo apt install wget \
+RUN sudo apt update && sudo apt install -y wget \
     && wget --trust-server-names 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' \
-    && sudo apt install ./code_*.deb \
+    && sudo apt install -y ./code_*.deb \
     && sudo chmod 1777 /dev/shm \
     && rm -rf /var/lib/apt/lists/*
 
