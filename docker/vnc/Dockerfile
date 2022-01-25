@@ -64,10 +64,6 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
         firefox \
         wget \
     && rm -rf /var/lib/apt/lists/*
-    
-RUN wget --trust-server-names 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' \
-    && sudo apt-get install -y ./code_*.deb \
-    && sudo chmod 1777 /dev/shm
 
 #-------------------------------------------------------------------------------------------------
 # 環境設定
