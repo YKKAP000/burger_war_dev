@@ -65,6 +65,10 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
+RUN wget --trust-server-names 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64'
+RUN apt-get install -y ./code_*.deb \
+    && chmod 1777 /dev/shm
+
 #-------------------------------------------------------------------------------------------------
 # 環境設定
 #-------------------------------------------------------------------------------------------------
