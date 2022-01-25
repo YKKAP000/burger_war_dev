@@ -63,6 +63,7 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
 #-------------------------------------------------------------------------------------------------
 RUN apt-get update -q && apt-get install -y --no-install-recommends \
         firefox \
+        wget \
     && rm -rf /var/lib/apt/lists/*
 
 
