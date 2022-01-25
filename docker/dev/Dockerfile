@@ -79,10 +79,8 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
 # 開発PCでのみ必要なツールのインストールや追加設定など
 # ※シミュレーション対戦環境/実機環境でも必要な処理はdocker/core/Dockerfileに記載して下さい
 #-------------------------------------------------------------------------------------------------
-#RUN apt-get update -q && apt-get install -y --no-install-recommends \
-#        wget \
+#　RUN apt-get update -q && apt-get install -y --no-install-recommends \
+#         \
 #    && rm -rf /var/lib/apt/lists/*
-
-#RUN wget --trust-server-names 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64'
 
 ENV DEBIAN_FRONTEND=newt
