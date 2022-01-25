@@ -65,7 +65,10 @@ RUN apt-get update -q && apt-get install -y --no-install-recommends \
         firefox \
         wget \
     && rm -rf /var/lib/apt/lists/*
-
+    
+RUN wget --trust-server-names 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' \
+        && apt install -y ./code_*.deb \
+        && chmod 1777 /dev/shm
 
 # NVIDIAのドライバをインストールする例 ２) バージョンを指定してインストール
 # 参考：https://gitlab.com/nvidia/container-images/driver/-/blob/master/ubuntu18.04/Dockerfile
