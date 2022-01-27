@@ -24,21 +24,9 @@ class RandomBot():
 
     def calcTwist(self):
         value = random.randint(1,1000)
-        if value < 250:
-            x = 0.2
-            th = 0
-        elif value < 500:
-            x = -0.2
-            th = 0
-        elif value < 750:
-            x = 0
-            th = 1
-        elif value < 1000:
-            x = 0
-            th = -1
-        else:
-            x = 0
-            th = 0
+        x = 0.2
+        th = 0
+        
         twist = Twist()
         twist.linear.x = x; twist.linear.y = 0; twist.linear.z = 0
         twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th
