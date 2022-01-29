@@ -57,7 +57,8 @@ class NaviBot():
     def strategy(self):
         r = rospy.Rate(5) # change speed 5fps
 
-        goals = readCsv(os.path.dirname(__file__) + "/input/strategy.csv")
+ #       goals = readCsv(os.path.dirname(__file__) + "/input/strategy.csv")
+        goals = readCsv(os.path.dirname(__file__) + "/input/strategy2.csv")
         for goal in goals:
             self.setGoal(goal)
 
