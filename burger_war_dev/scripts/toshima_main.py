@@ -12,7 +12,6 @@ from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from cv_bridge import CvBridge, CvBridgeError
-import cv2
 
 import tf
 
@@ -21,13 +20,9 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib_msgs
 
 from utils import readCsv
+from camera import processImage, showImage
 
 # Ref: https://hotblackrobotics.github.io/en/blog/2018/01/29/action-client-py/
-
-#from std_msgs.msg import String
-#from sensor_msgs.msg import Image
-#from cv_bridge import CvBridge, CvBridgeError
-#import cv2
 
 class ConnechBot():
     def __init__(self, 
@@ -50,6 +45,7 @@ class ConnechBot():
             self.img = None
             self.bridge = CvBridge()
             self.image_sub = rospy.Subscriber('image_raw', Image, self.imageCallback)
+            self.image_pub = rospy.Publisher('output_image', Image, queue_size=1)
 
         # imu subscriber
         if use_imu:
@@ -105,12 +101,14 @@ class ConnechBot():
     # comvert image topic to opencv object and show
     def imageCallback(self, data):
         try:
-            self.img = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            in_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             rospy.logerr(e)
+        out_img = processImage(in_img)
+        # self.image_pub.publish(self.bridge.cv2_to_imgmsg(out_img, 'mono8'))
 
-        cv2.imshow("Image window", self.img)
-        cv2.waitKey(1)
+        # Show processed image on a Window
+        showImage(out_img)
 
     # imu call back sample
     # update imu state
