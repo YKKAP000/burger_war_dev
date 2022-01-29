@@ -1,0 +1,166 @@
+**** 2022.1.22 *****
+Navigation パラメータまとめ
+
+(1) move_base_params.yaml
+shutdown_costmaps:
+　　move_base が非活性化された状態のとき、costmapノードを停止するか
+controller_frequency:
+　　ロボットベースへ速度指令を下すコントロール反復周期(Hz)
+planner_patience:
+　　space-clearing が実行される前、使用可能な計画を探索するときに待機する最大時間(sec)
+controller_patience: 
+　　space-clearing が実行される前、コントローラーが制御情報を受信するために待機する最大時間(sec)
+conservative_reset_dist:
+　　復旧動作の costmap 初期化時に、この距離より遠い場所にある障害物は地図から削除される
+planner_frequency:
+　　全域計画の反復周期(Hz)
+oscillation_timeout:
+　　recovery behavior を実行する前、使用可能な計画を探索するときに待機する最大時間(sec)
+oscillation_distance: 0.2
+　　ロボットが微動しないように動く必要がある距離(m) この距離を動くと oscillation_timeoutが初期化
+
+(2) base_local_planner_params.yaml
+controller_frequency:
+　　経路のプランニングを行う周期
+max_vel_x:
+　　ロボットの最高並進速度（メートル毎秒）
+min_vel_x:
+　　ロボットの最低並進速度（メートル毎秒）
+max_rotational_vel:
+　　ロボットの最高回転速度（ラジアン毎秒）
+min_in_place_vel_theta:
+　　ロボットの最低回転速度（ラジアン毎秒）
+escape_vel:
+　　ロボットが回避するときの速度（メートル毎秒）。負の値は後退
+acc_lim_x: 
+　　x座標方向への加速度の最大値
+acc_lim_y: 
+　　y座標方向への加速度の最大値。0の場合は非ホロノミック台車の場合で真横には動けない
+acc_lim_theta: 
+　　回転の加速度の最大値
+holonomic_robot: 
+　　全方位移動台車を使っていない場合は常に false
+yaw_goal_tolerance: 
+　　目的の姿勢との許容誤差（ラジアン）。この値が小さいとゴール付近で振動してしまう。　　
+xy_goal_tolerance: 
+　　目的の位置との許容誤差（メートル）。地図の解像度よりも小さい値にしないこと。
+pdist_scale: 
+　　グローバルパスにどれだけ正確に沿って移動するか。gdist_scaleより大きな値にすると、よりグローバルパスに沿って動く。
+gdist_scale: 
+　　ゴールを目指すか、グローバルパスに沿うか、を決める。　　
+occdist_scale:
+　　障害物を回避する程度を決める。
+sim_time: 
+　　どれくらい先を考慮するか
+dwa: true
+　　Dynamic Window Approach を使うか否か
+
+(3) costmap_common_params.yaml
+robot_radius: 
+　　円形ロボットの場合、ロボットの半径（メートル）。
+　　円形で無いロボットの場合はfootprintパラメータを使う。
+　　0.165はTurtlebotのサイズ
+footprint: [[x0, y0], [x1, y1], [x2, y2], [x3, y3], etc]
+　　ロボットの形状
+inflation_radius: 
+　　ロボットが障害物にぶつからないようにするための膨張パラメータ
+
+(4) global_costmap_params.yaml
+global_frame: /map
+　　global cost map のフレーム名称
+robot_base_fame: /base_footprint
+　　TurtleBot用には /base_footprint　を使う
+update_frequency: 
+　　global mapを更新する頻度
+publish_frequency: 
+　　static globalマップは通常連続して配信する必要な無い
+static_map: 
+　　global map は静的
+rolling_window: 
+　　global map はロボットが動いても変更されないのでfalseにする
+transform_tolerance: 
+　　ネットワークの遅延に対処するための待ち時間（秒）
+
+(5) local_costmap_params.yaml
+global_frame: /odom
+　　local cost mapにおけるオドメトリのフレーム
+robot_base_fame: /base_footprint
+　　/base_link あるいは /base_footprintを設定
+　　TurtleBot の場合は /base_footprint.
+update_frequency: 
+　　local map の更新頻度
+publish_frequency: 
+　　local map の配信頻度　　
+static_map: 
+　　local map は更新されるので、静的では無い。
+rolling_window: 
+　　local map は更新される。
+width: 
+　　rolling map　x座標方向
+height: 
+　　rolling map　y座標方向
+Resolution: 
+　　rolling mapの解像度
+transform_tolerance: 
+　　ネットワークの遅延に対処するための待ち時間（秒）
+
+(6) dwa_local_planner_params.yaml
+Robot Configuration Parameters
+max_vel_x:
+min_vel_x:
+max_vel_y:
+min_vel_y:
+
+The velocity when robot is moving in a straight line
+max_trans_vel: 
+min_trans_vel: 
+max_rot_vel: 
+
+acc_lim_x:
+acc_lim_y: 
+acc_lim_theta: 
+
+Goal Tolerance Parametes
+xy_goal_tolerance: 
+yaw_goal_tolerance: 0.34
+latch_xy_goal_tolerance: false
+　　ここまでbase_local_planner_paramsと同様
+
+Forward Simulation Parameters
+sim_time: 
+　　ロボットの移動を何秒間シミュレートするか
+vx_samples: 
+　　（X座標方向）何段階速度をシミュレートするか
+vy_samples:
+　　（Y座標方向）何段階速度をシミュレートするか
+vth_samples: 
+　　（回転方向）何段階回転速度をシミュレートするか
+controller_frequency: 
+　　シミュレーションの頻度
+
+Trajectory Scoring Parameters
+path_distance_bias:
+　　base_local_planner の pdist_scale と同じ
+goal_distance_bias:
+　　base_local_planner の gdist_scale と同じ
+occdist_scale:
+　　base_local_planner の occdist_scaleと同じ
+forward_point_distance:
+　　追加 scoreing point の場所
+    base_local_plannerでいうheading_lookaheadというパラメータと同じ役割をしていると思われる
+stop_time_buffer: 
+　　ロボットが衝突前に停止するまでに必要な時間
+scaling_speed: 
+　　スケーリング速度（メートル/秒）
+max_scaling_factor: 
+    最大スケーリング要素
+
+Oscillation Prevention Parameters
+oscillation_reset_dist: 0.05
+　　オシレーションフラグがリセットされる前にロボットが移動しなければならない距離
+
+Debugging
+publish_traj_pc : true
+　　移動軌跡デバック設定
+publish_cost_grid_pc: true
+　　コストマップデバック設定
