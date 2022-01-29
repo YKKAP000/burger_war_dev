@@ -12,15 +12,19 @@ DWAPlannerROS:
   min_trans_vel:  0.11
 
   max_rot_vel: 2.75
-  min_rot_vel: 1.37
+  min_rot_vel: 0.1  
+#  min_rot_vel: 1.37
 
   acc_lim_x: 2.5
   acc_lim_y: 0.0
   acc_lim_theta: 3.2 
 
 # Goal Tolerance Parametes
-  xy_goal_tolerance: 0.05
-  yaw_goal_tolerance: 0.17
+#  xy_goal_tolerance: 0.05
+#  yaw_goal_tolerance: 0.17
+  xy_goal_tolerance: 0.15
+  yaw_goal_tolerance: 0.34
+
   latch_xy_goal_tolerance: false
 
 # Forward Simulation Parameters
@@ -31,7 +35,8 @@ DWAPlannerROS:
   controller_frequency: 10.0
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 32.0
+#  path_distance_bias: 32.0
+  path_distance_bias: 50.0  
   goal_distance_bias: 20.0
   occdist_scale: 0.02
   forward_point_distance: 0.325
