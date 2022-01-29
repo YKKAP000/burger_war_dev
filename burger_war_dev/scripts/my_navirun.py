@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 import rospy
 import random
+import os
 
 from geometry_msgs.msg import Twist
 
 import tf
 
-
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib_msgs
+
+from utils import readCsv
 
 # Ref: https://hotblackrobotics.github.io/en/blog/2018/01/29/action-client-py/
 
@@ -26,21 +28,19 @@ class NaviBot():
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
+        self.pi = 3.1415
 
-
-
-
-    def setGoal(self,x,y,yaw):
+    def setGoal(self, pose2d):
         self.client.wait_for_server()
 
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = "map"
         goal.target_pose.header.stamp = rospy.Time.now()
-        goal.target_pose.pose.position.x = x
-        goal.target_pose.pose.position.y = y
+        goal.target_pose.pose.position.x = pose2d[0]
+        goal.target_pose.pose.position.y = pose2d[1]
 
         # Euler to Quartanion
-        q=tf.transformations.quaternion_from_euler(0,0,yaw)        
+        q=tf.transformations.quaternion_from_euler(0,0,pose2d[2])
         goal.target_pose.pose.orientation.x = q[0]
         goal.target_pose.pose.orientation.y = q[1]
         goal.target_pose.pose.orientation.z = q[2]
@@ -54,24 +54,12 @@ class NaviBot():
         else:
             return self.client.get_result()        
 
-
     def strategy(self):
         r = rospy.Rate(5) # change speed 5fps
 
-        self.setGoal(-0.95,0.5,3.1415/4)
-        self.setGoal(-0.75,0.75,3.1415/4) 
-        self.setGoal(-0.40,1.0,3.1415/4) 
-	self.setGoal(0,1.25,0)
-	self.setGoal(0.3,1.1,-3.1415/4)
-	self.setGoal(0.70,0.75,-3.1415/4) 
-        self.setGoal(0.9,0.45,-3.1415/4)
-	self.setGoal(0.9,0.0,-3.1415/2)
-        self.setGoal(0.9,-0.45,-3.1415/1.33)
-	self.setGoal(0.70,-0.75,-3.1415/1.33) 
-	self.setGoal(0,-1.25,-3.1415)
-	self.setGoal(-0.6,0,0)
-
-
+        goals = readCsv(os.path.dirname(__file__) + "/input/strategy.csv")
+        for goal in goals:
+            self.setGoal(goal)
 
 if __name__ == '__main__':
     rospy.init_node('navirun')
