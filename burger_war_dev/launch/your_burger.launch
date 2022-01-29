@@ -5,6 +5,7 @@
     <!-- You can change control program  -->
 
     <!-- sample program node -->
+
 　　<!--
     <node pkg="burger_war_dev" type="randomRun.py" name="randomRun" output="screen"/>
 　　-->
@@ -19,4 +20,3 @@
 
     <!-- End of your space  -->
 </launch>
-
