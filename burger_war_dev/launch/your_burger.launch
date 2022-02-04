@@ -3,14 +3,18 @@
   <arg name="side" default="r"/> <!-- "b" = blue side, "r" = red side  -->
 
     <!-- You can change control program  -->
+    <!--
     <include file="$(find burger_navigation)/launch/burger_navigation.launch" />
-    <node pkg="burger_war_dev" type="toshima_main.py" name="connechRun" output="screen"/>
+    <node pkg="burger_war_dev" type="toshima_main.py" name="connechRun" output="screen"/> -->
+    
+    <include file="$(find burger_navigation)/launch/burger_navigation.launch" />
+    <node pkg="burger_war_dev" type="connech_main.py" name="connechRun" output="screen"/>
 
     <!-- sample program node -->
 
     <!--
     <node pkg="burger_war_dev" type="randomRun.py" name="randomRun" output="screen"/>
-　　-->
+    -->
     <!-- END sample program node -->
 
     <!-- Navigation sample program  -->
