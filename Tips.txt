@@ -1,0 +1,7 @@
+* Liderによる障害物検知
+
+obstacle_detectorを使う
+https://qiita.com/srs/items/d3b9425cedf57ab269ff
+
+Original github
+https://github.com/tysik/obstacle_detector
