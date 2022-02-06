@@ -29,6 +29,8 @@ class ConnechBot():
                  use_lidar=False, use_camera=False, use_imu=False,
                  use_odom=False, use_joint_states=False):
         
+        self.tf_listener     = tf.TransformListener()
+        
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
@@ -91,10 +93,7 @@ class ConnechBot():
             for goal in goals:
                 self.setGoal(goal)
                 
-                
-
     # http://wiki.ros.org/ja/tf/Tutorials/tf%20and%20Time%20%28Python%29
-    # https://makemove.hatenablog.com/entry/2014/09/23/182742
     # tfで座標情報を取得（基本 /map → /baselink）
     def listen_connechbot_pose(self, frame1, frame2):
         trans = []                  # x, y, z を格納
