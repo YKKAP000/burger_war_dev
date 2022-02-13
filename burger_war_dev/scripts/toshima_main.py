@@ -95,42 +95,50 @@ class ConnechBot():
     # update lidar scan state
     def lidarCallback(self, data):
         self.scan = data
-        rospy.loginfo(self.scan)
+        #rospy.loginfo(self.scan)
 
     # camera image call back sample
-    # comvert image topic to opencv object and show
+    # convert image topic to opencv object and show
     def imageCallback(self, data):
         try:
             in_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             rospy.logerr(e)
-        out_img = processImage(in_img)
-        # self.image_pub.publish(self.bridge.cv2_to_imgmsg(out_img, 'mono8'))
+
+        # color detection
+        self.yellow_flag, yellow_img = processImage(in_img, "yellow")
+        self.blue_flag, blue_img = processImage(in_img, "blue")
+        self.green_flag, green_img = processImage(in_img, "green")
+        #rospy.loginfo("yellow: {}".format(self.yellow_flag))
+        rospy.loginfo("blue: {}".format(self.blue_flag))
+        #rospy.loginfo("green: {}".format(self.green_flag))
 
         # Show processed image on a Window
-        showImage(out_img)
+        #showImage(yellow_img)
+        showImage(blue_img)
+        #showImage(green_img)
 
     # imu call back sample
     # update imu state
     def imuCallback(self, data):
         self.imu = data
-        rospy.loginfo(self.imu)
+        #rospy.loginfo(self.imu)
 
     # odom call back sample
     # update odometry state
     def odomCallback(self, data):
         self.pose_x = data.pose.pose.position.x
         self.pose_y = data.pose.pose.position.y
-        rospy.loginfo("odom pose_x: {}".format(self.pose_x))
-        rospy.loginfo("odom pose_y: {}".format(self.pose_y))
+        #rospy.loginfo("odom pose_x: {}".format(self.pose_x))
+        #rospy.loginfo("odom pose_y: {}".format(self.pose_y))
 
     # jointstate call back sample
     # update joint state
     def jointstateCallback(self, data):
         self.wheel_rot_r = data.position[0]
         self.wheel_rot_l = data.position[1]
-        rospy.loginfo("joint_state R: {}".format(self.wheel_rot_r))
-        rospy.loginfo("joint_state L: {}".format(self.wheel_rot_l))
+        #rospy.loginfo("joint_state R: {}".format(self.wheel_rot_r))
+        #rospy.loginfo("joint_state L: {}".format(self.wheel_rot_l))
 
 if __name__ == '__main__':
     rospy.init_node('connechRun')
