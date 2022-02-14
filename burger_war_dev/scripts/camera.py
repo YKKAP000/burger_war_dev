@@ -45,8 +45,8 @@ def detectYellowColor(frame):
     # BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     # Range of Yellow
-    hsv_min = np.array([30, 64, 0])
-    hsv_max = np.array([60,255,255])
+    hsv_min = np.array([30, 128, 0])
+    hsv_max = np.array([55,255,255])
     # Mask of Yellow
     mask = cv2.inRange(hsv, hsv_min, hsv_max)
     # Masking
