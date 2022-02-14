@@ -12,6 +12,8 @@ def processImage(frame, color):
         mask, masked_img = detectGreenColor(frame)
     elif color == "blue":
         mask, masked_img = detectBlueColor(frame)
+    elif color == "red":
+        mask, masked_img = detectRedColor(frame)
     else:
         return -1, None
 
@@ -42,10 +44,10 @@ def processImage(frame, color):
 def detectYellowColor(frame):
     # BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # Range of Green
+    # Range of Yellow
     hsv_min = np.array([30, 64, 0])
     hsv_max = np.array([60,255,255])
-    # Mask of Green
+    # Mask of Yellow
     mask = cv2.inRange(hsv, hsv_min, hsv_max)
     # Masking
     masked_img = cv2.bitwise_and(frame, frame, mask=mask)
@@ -68,15 +70,37 @@ def detectGreenColor(frame):
 def detectBlueColor(frame):
     # BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # Range of Green
+    # Range of Blue
     hsv_min = np.array([90, 64, 0])
     hsv_max = np.array([150,255,255])
-    # Mask of Green
+    # Mask of Blue
     mask = cv2.inRange(hsv, hsv_min, hsv_max)
     # Masking
     masked_img = cv2.bitwise_and(frame, frame, mask=mask)
 
     return mask, masked_img
+
+def detectRedColor(frame):
+    # BGR to HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # Range of Red1
+    hsv_min = np.array([0, 128, 0])
+    hsv_max = np.array([20,255,255])
+    # Mask of Red1
+    mask1 = cv2.inRange(hsv, hsv_min, hsv_max)
+    # Range of Red2
+    hsv_min = np.array([150, 128, 0])
+    hsv_max = np.array([179,255,255])
+    # Mask of Red2
+    mask2 = cv2.inRange(hsv, hsv_min, hsv_max)
+
+    mask = mask1 + mask2
+
+    # Masking
+    masked_img = cv2.bitwise_and(frame, frame, mask=mask)
+
+    return mask, masked_img
+
 
 def showImage(img):
     cv2.imshow("Image window", img)
