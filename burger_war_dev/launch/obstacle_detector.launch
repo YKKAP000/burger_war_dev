@@ -25,7 +25,6 @@
   <!-- load parameter file -->
   <rosparam command="load" file="$(find burger_war_dev)/config/obstacle_detector.yaml" />
 
-  <arg name="robot_namespace" default=""/>
   <node name="obstacle_extractor" pkg="obstacle_detector" type="obstacle_extractor_node">
     <param name="frame_id" value="$(arg robot_namespace)/map"/>
   </node>
