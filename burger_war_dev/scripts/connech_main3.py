@@ -35,7 +35,7 @@ class ConnechBot():
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
-
+        self.listener = tf.TransformListener()
         # lidar scan subscriber
         if use_lidar:
             self.scan = LaserScan()
@@ -57,11 +57,10 @@ class ConnechBot():
         # odom subscriber
         if use_odom:
             self.listener = tf.TransformListener()
-            rospy.Subscriber('enemy_position', Odometry, self.enemy_position_callback)
             self.enemy_position = Odometry()
             self.enemy_info = [0.0, 0.0]
             self.detect_counter = 0
-            
+            rospy.Subscriber('enemy_position', Odometry, self.enemylocationCallback)
             self.odom_sub = rospy.Subscriber('odom', Odometry, self.odomCallback)
 
         # joint_states subscriber
@@ -133,11 +132,9 @@ class ConnechBot():
         state, distance, direction_deff = self.detect_enemylocation()
         return state, distance, direction_deff
 
-    # https://makemove.hatenablog.com/entry/2014/09/23/182742
-    # tfで座標情報を取得（基本 /map → /baselink）
     def listen_connechbot_pose(self, frame1, frame2):
-        trans = []                  # x, y, z を格納
-        rot = []                    # x, y, z, w （quaternion）を格納
+        trans = []                  # x, y, z \u3092\u683c\u7d0d
+        rot = []                    # x, y, z, w \uff08quaternion\uff09\u3092\u683c\u7d0d
         try:
             (trans, rot) = self.listener.lookupTransform(frame1, frame2, rospy.Time(0))
             return True, trans, rot
@@ -148,12 +145,26 @@ class ConnechBot():
     def enemylocationCallback(self, position):
         self.enemy_position = position
 
+    # Respect seigot
     def detect_enemylocation(self):
+        # data management
+        # time_diff = rospy.Time.now().to_sec() - self.enemy_position.header.stamp.to_sec()
+        # time_diff = rospy.Time.now().to_sec()
+        # if time_diff > 0.5:
+        #     self.detect_counter = 0
+        #     return False, 0.0, 0.0
+        # else:
+        #     self.detect_counter = self.detect_counter+1
+        #     if self.detect_counter < self.counter_th:
+        #         return False, 0.0, 0.0
+
         # set frame
-        map_frame = self.robot_namespace+"map"
-        link_frame = self.robot_namespace+"base_link"
+        # map_frame = self.robot_namespace+"map"
+        # link_frame = self.robot_namespace+"base_link"
+        map_frame = "map"
+        link_frame = "base_link"
         
-        # get seft position
+        # get self position
         valid, trans, rot = self.listen_connechbot_pose(map_frame, link_frame)
         if valid == False:
             return False, 0.0, 0.0
@@ -162,7 +173,9 @@ class ConnechBot():
         dx = self.enemy_position.pose.pose.position.x - trans[0]
         dy = self.enemy_position.pose.pose.position.y - trans[1]
         distance = math.sqrt( pow(dx, 2) + pow(dy, 2) )
-        
+        rospy.loginfo("enemy_position_x: {}".format(self.enemy_position.pose.pose.position.x))
+        rospy.loginfo("enemy_position_y: {}".format(self.enemy_position.pose.pose.position.y))
+
         # Calculating the direction from enemybot
         direction = math.atan2(dx, dy)
         roll, pitch, yaw = tf.transformations.euler_from_quaternion(rot)
@@ -214,6 +227,10 @@ class ConnechBot():
 
 if __name__ == '__main__':
     rospy.init_node('connechRun')
-    bot = ConnechBot(use_lidar=True, use_camera=True, use_imu=True,
-                     use_odom=True, use_joint_states=True)
-    bot.strategy()
+    node = ConnechBot()
+    bot = ConnechBot(use_lidar=True, use_camera=True, use_imu=True, use_odom=True, use_joint_states=True)
+    # bot.strategy()
+    rate = rospy.Rate(30)
+    while not rospy.is_shutdown():
+        node.status_judgment()
+        rate.sleep()
