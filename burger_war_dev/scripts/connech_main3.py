@@ -133,8 +133,8 @@ class ConnechBot():
         return state, distance, direction_deff
 
     def listen_connechbot_pose(self, frame1, frame2):
-        trans = []                  # x, y, z \u3092\u683c\u7d0d
-        rot = []                    # x, y, z, w \uff08quaternion\uff09\u3092\u683c\u7d0d
+        trans = []                  # x, y, z
+        rot = []                    # x, y, z, w 
         try:
             (trans, rot) = self.listener.lookupTransform(frame1, frame2, rospy.Time(0))
             return True, trans, rot
