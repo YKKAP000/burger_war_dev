@@ -24,7 +24,8 @@ class SearchEnemy:
         self.pub_enemy_position = rospy.Publisher('enemy_position', Odometry, queue_size=10)
         self.robot_namespace = rospy.get_param('~robot_namespace', '')
         self.enemy_pos = Odometry()
-        self.enemy_pos.header.frame_id = self.robot_namespace+'/map'
+        # self.enemy_pos.header.frame_id = self.robot_namespace+'/map'
+        self.enemy_pos.header.frame_id = '/map'
 
     def obstacles_callback(self, msg):
 
@@ -37,19 +38,23 @@ class SearchEnemy:
             temp_x = msg.circles[num].center.x
             temp_y = msg.circles[num].center.y
 
-            #フィールド内のオブジェクトであればパス
+            #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u30aa\u30d6\u30b8\u30a7\u30af\u30c8\u3067\u3042\u308c\u3070\u30d1\u30b9
             if self.is_point_enemy(temp_x, temp_y) == False:
                 continue
 
-            #敵の座標をTFでbroadcast
-            enemy_frame_name = self.robot_namespace + '/enemy_' + str(num)
-            map_frame_name   = self.robot_namespace + "/map"
+            #\u6575\u306e\u5ea7\u6a19\u3092TF\u3067broadcast
+            # enemy_frame_name = self.robot_namespace + '/enemy_' + str(num)
+            # map_frame_name   = self.robot_namespace + "/map"
+            enemy_frame_name = '/enemy_' + str(num)
+            map_frame_name   = "/map"
             self.tf_broadcaster.sendTransform((temp_x,temp_y,0), (0,0,0,1), rospy.Time.now(), enemy_frame_name, map_frame_name)
 
-            #ロボットから敵までの距離を計算
+            #\u30ed\u30dc\u30c3\u30c8\u304b\u3089\u6575\u307e\u3067\u306e\u8ddd\u96e2\u3092\u8a08\u7b97
             try:
-                target_frame_name = self.robot_namespace + '/enemy_' + str(num)
-                source_frame_name = self.robot_namespace + "/base_footprint"
+                # target_frame_name = self.robot_namespace + '/enemy_' + str(num)
+                # source_frame_name = self.robot_namespace + "/base_footprint"
+                target_frame_name = '/enemy_' + str(num)
+                source_frame_name = "/base_footprint"
                 (trans,rot) = self.tf_listener.lookupTransform(source_frame_name, target_frame_name, rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue
@@ -61,11 +66,13 @@ class SearchEnemy:
                 closest_enemy_x   = temp_x
                 closest_enemy_y   = temp_y
 
-        #敵を検出している場合、その座標と距離を出力
+        #\u6575\u3092\u691c\u51fa\u3057\u3066\u3044\u308b\u5834\u5408\u3001\u305d\u306e\u5ea7\u6a19\u3068\u8ddd\u96e2\u3092\u51fa\u529b
         if closest_enemy_len < sys.float_info.max:
 
-            map_frame_name   = self.robot_namespace + "/map"
-            enemy_frame_name = self.robot_namespace + "/enemy_closest"
+            # map_frame_name   = self.robot_namespace + "/map"
+            # enemy_frame_name = self.robot_namespace + "/enemy_closest"
+            map_frame_name   = "/map"
+            enemy_frame_name = "/enemy_closest"
             self.tf_broadcaster.sendTransform((closest_enemy_x,closest_enemy_y,0), (0,0,0,1), rospy.Time.now(), enemy_frame_name, map_frame_name)
 
             self.enemy_pos.header.stamp = rospy.Time.now()
@@ -77,30 +84,30 @@ class SearchEnemy:
             self.enemy_pos.pose.pose.orientation = quaternion
             self.pub_enemy_position.publish(self.enemy_pos)
 
-            #ロボットから敵までの距離をpublish
+            #\u30ed\u30dc\u30c3\u30c8\u304b\u3089\u6575\u307e\u3067\u306e\u8ddd\u96e2\u3092publish
             self.pub_robot2enemy.publish(closest_enemy_len)
 
     def is_point_enemy(self, point_x, point_y):
 
-#             *        ← +x
-#           ／  ＼      ↑ +y
-#         ／      ＼
-#       ／  2    3  ＼
-#     ／              ＼
+#             *        \u2190 +x
+#           \uff0f  \uff3c      \u2191 +y
+#         \uff0f      \uff3c
+#       \uff0f  2    3  \uff3c
+#     \uff0f              \uff3c
 #    *        5        *
-#     ＼              ／
-#       ＼  1    4  ／
-#         ＼      ／
-#           ＼  ／
+#     \uff3c              \uff0f
+#       \uff3c  1    4  \uff0f
+#         \uff3c      \uff0f
+#           \uff3c  \uff0f
 #             *
 #    1 ~ 4 : conner obstacle | position (x, y) = (±0.53, ±0.53)
 #    5     : center obstacle | position (x, y) = ( 0, 0)
 
-        #フィールド内の物体でない、敵と判定する閾値（半径）
+        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u7269\u4f53\u3067\u306a\u3044\u3001\u6575\u3068\u5224\u5b9a\u3059\u308b\u95be\u5024\uff08\u534a\u5f84\uff09
         thresh_corner = 0.20
         thresh_center = 0.35
 
-        #フィールド内かチェック
+        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u304b\u30c1\u30a7\u30c3\u30af
         if   point_y > (-point_x + 1.55):
             return False
         elif point_y < (-point_x - 1.55):
@@ -110,7 +117,7 @@ class SearchEnemy:
         elif point_y < ( point_x - 1.55):
             return False
 
-        #フィールド内の物体でないかチェック
+        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u7269\u4f53\u3067\u306a\u3044\u304b\u30c1\u30a7\u30c3\u30af
         p1 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y - 0.53), 2))
         p2 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y + 0.53), 2))
         p3 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y + 0.53), 2))
