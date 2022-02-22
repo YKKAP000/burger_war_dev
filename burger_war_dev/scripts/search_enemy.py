@@ -38,18 +38,17 @@ class SearchEnemy:
             temp_x = msg.circles[num].center.x
             temp_y = msg.circles[num].center.y
 
-            #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u30aa\u30d6\u30b8\u30a7\u30af\u30c8\u3067\u3042\u308c\u3070\u30d1\u30b9
+            # judgment of inside / outside the field
             if self.is_point_enemy(temp_x, temp_y) == False:
                 continue
 
-            #\u6575\u306e\u5ea7\u6a19\u3092TF\u3067broadcast
             # enemy_frame_name = self.robot_namespace + '/enemy_' + str(num)
             # map_frame_name   = self.robot_namespace + "/map"
             enemy_frame_name = '/enemy_' + str(num)
             map_frame_name   = "/map"
             self.tf_broadcaster.sendTransform((temp_x,temp_y,0), (0,0,0,1), rospy.Time.now(), enemy_frame_name, map_frame_name)
 
-            #\u30ed\u30dc\u30c3\u30c8\u304b\u3089\u6575\u307e\u3067\u306e\u8ddd\u96e2\u3092\u8a08\u7b97
+            # calculate the distance to the enemybot
             try:
                 # target_frame_name = self.robot_namespace + '/enemy_' + str(num)
                 # source_frame_name = self.robot_namespace + "/base_footprint"
@@ -66,7 +65,7 @@ class SearchEnemy:
                 closest_enemy_x   = temp_x
                 closest_enemy_y   = temp_y
 
-        #\u6575\u3092\u691c\u51fa\u3057\u3066\u3044\u308b\u5834\u5408\u3001\u305d\u306e\u5ea7\u6a19\u3068\u8ddd\u96e2\u3092\u51fa\u529b
+        # Publish an enemybot position and distance
         if closest_enemy_len < sys.float_info.max:
 
             # map_frame_name   = self.robot_namespace + "/map"
@@ -82,32 +81,20 @@ class SearchEnemy:
             q = tf.transformations.quaternion_from_euler(0, 0, yaw)
             quaternion = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
             self.enemy_pos.pose.pose.orientation = quaternion
-            self.pub_enemy_position.publish(self.enemy_pos)
 
-            #\u30ed\u30dc\u30c3\u30c8\u304b\u3089\u6575\u307e\u3067\u306e\u8ddd\u96e2\u3092publish
+            self.pub_enemy_position.publish(self.enemy_pos)
             self.pub_robot2enemy.publish(closest_enemy_len)
 
     def is_point_enemy(self, point_x, point_y):
 
-#             *        \u2190 +x
-#           \uff0f  \uff3c      \u2191 +y
-#         \uff0f      \uff3c
-#       \uff0f  2    3  \uff3c
-#     \uff0f              \uff3c
-#    *        5        *
-#     \uff3c              \uff0f
-#       \uff3c  1    4  \uff0f
-#         \uff3c      \uff0f
-#           \uff3c  \uff0f
-#             *
 #    1 ~ 4 : conner obstacle | position (x, y) = (±0.53, ±0.53)
 #    5     : center obstacle | position (x, y) = ( 0, 0)
 
-        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u7269\u4f53\u3067\u306a\u3044\u3001\u6575\u3068\u5224\u5b9a\u3059\u308b\u95be\u5024\uff08\u534a\u5f84\uff09
+        # 
         thresh_corner = 0.20
         thresh_center = 0.35
 
-        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u304b\u30c1\u30a7\u30c3\u30af
+        #Threshhold of enemy / object
         if   point_y > (-point_x + 1.55):
             return False
         elif point_y < (-point_x - 1.55):
@@ -116,8 +103,7 @@ class SearchEnemy:
             return False
         elif point_y < ( point_x - 1.55):
             return False
-
-        #\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306e\u7269\u4f53\u3067\u306a\u3044\u304b\u30c1\u30a7\u30c3\u30af
+            
         p1 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y - 0.53), 2))
         p2 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y + 0.53), 2))
         p3 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y + 0.53), 2))
