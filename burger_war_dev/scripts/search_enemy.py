@@ -104,10 +104,10 @@ class SearchEnemy:
         elif point_y < ( point_x - 1.55):
             return False
             
-        p1 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y - 0.53), 2))
-        p2 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y + 0.53), 2))
-        p3 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y + 0.53), 2))
-        p4 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y - 0.53), 2))
+        p1 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y - 0.53), 2))
+        p2 = math.sqrt(pow((point_x - 0.53), 2) + pow((point_y + 0.53), 2))
+        p3 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y - 0.53), 2))
+        p4 = math.sqrt(pow((point_x + 0.53), 2) + pow((point_y + 0.53), 2))
         p5 = math.sqrt(pow(point_x         , 2) + pow(point_y         , 2))
 
         if p1 < thresh_corner or p2 < thresh_corner or p3 < thresh_corner or p4 < thresh_corner or p5 < thresh_center:

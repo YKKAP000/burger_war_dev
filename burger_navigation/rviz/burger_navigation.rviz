@@ -21,6 +21,7 @@ Panels:
         - /Local Map1/Planner1
         - /Amcl Particles1
         - /Goal1
+        - /Obstacles1
       Splitter Ratio: 0.5
     Tree Height: 564
   - Class: rviz/Selection
@@ -481,7 +482,7 @@ Visualization Manager:
       Opacity: 0.75
       Segments color: 170; 170; 0
       Segments thickness: 0.029999999329447746
-      Topic: ""
+      Topic: /obstacles
       Unreliable: false
       Value: true
   Enabled: true
@@ -541,5 +542,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1280
-  X: 0
-  Y: 0
+  X: -1
+  Y: -18

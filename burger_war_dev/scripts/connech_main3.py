@@ -89,36 +89,25 @@ class ConnechBot():
         goal.target_pose.pose.orientation.w = q[3]
 
         self.client.send_goal(goal)
+
         wait = self.client.wait_for_result()
         if not wait:
             rospy.logerr("Action server not available!")
             rospy.signal_shutdown("Action server not available!")
         else:
-            return self.client.get_result()
-        
+            return self.client.get_result() 
+
     def canselGoal(self):
-        self.move_base_client.cancel_all_goals()
+        # stop navigating
+        self.client.cancel_all_goals()
         return
-
-    def strategy(self):
-        r = rospy.Rate(5) # change speed 5fps
-
-        goals = readCsv(os.path.dirname(__file__) + "/input/strategy2.csv")
-        for i in range(3):
-            for goal in goals:
-                self.setGoal(goal)
                 
-    def status_judgment(self):
+    def task(self):
         # get state transition imformation
         state, distance, direction_deff = self.detect_enemy()
-        
-        if state == False:      # non-detecting enemybot
+
+        if state == False: # initial task
             self.patrol()
-        else:
-            if distance > 0.8:
-                self.patrol()
-            else:
-                self.escape()
 
     def patrol(self):
         r = rospy.Rate(5) # change speed 5fps
@@ -128,62 +117,117 @@ class ConnechBot():
             for goal in goals:
                 self.setGoal(goal)
 
+    def escape(self):
+        escape_goals = self.setEscapepoint()
+        self.setGoal(escape_goals)
+
+    def setEscapepoint(self):
+        enemy_x = self.enemy_position.pose.pose.position.x
+        enemy_y = self.enemy_position.pose.pose.position.y
+        
+        # select escape point
+        if   enemy_x > 0 and enemy_y > 0:
+            rospy.loginfo("escape point1")
+            escape_x = -0.8
+            escape_y = 0
+            escape_theta = 0
+        elif enemy_x < 0 and enemy_y > 0:
+            rospy.loginfo("escape point2")
+            escape_x = 0
+            escape_y = -0.8
+            escape_theta = 1.5708
+        elif enemy_x < 0 and enemy_y < 0:
+            rospy.loginfo("escape point3")
+            escape_x = 0.8
+            escape_y = 0
+            escape_theta = 3.1415
+        elif enemy_x > 0 and enemy_y < 0:
+            rospy.loginfo("escape point4")
+            escape_x = 0
+            escape_y = 0.8
+            escape_theta = 4.7123
+        
+        escape_point = [escape_x, escape_y, escape_theta]
+        return escape_point
+
     def detect_enemy(self):
         state, distance, direction_deff = self.detect_enemylocation()
         return state, distance, direction_deff
 
-    def listen_connechbot_pose(self, frame1, frame2):
-        trans = []                  # x, y, z
-        rot = []                    # x, y, z, w 
+    def listen_selflocation(self, frame1, frame2):
+        trans = []
+        rot = []   # quatarnion
         try:
             (trans, rot) = self.listener.lookupTransform(frame1, frame2, rospy.Time(0))
+            rospy.loginfo("tf succeed")
+            rospy.loginfo("trans: {}".format(trans))
+            rospy.loginfo("rot: {}".format(rot))
             return True, trans, rot
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             #continue
+            rospy.loginfo("tf failse")
             return False, trans, rot
     
     def enemylocationCallback(self, position):
         self.enemy_position = position
+        # rospy.loginfo("enemypos_x: {}".format(self.enemy_position.pose.pose.position.x))
+        # rospy.loginfo("enemypos_y: {}".format(self.enemy_position.pose.pose.position.y))
+
+        # get enemy_detector result
+        state, distance, direction_deff = self.detect_enemy()
+
+        # non-detecting enemybot
+        if distance > 0.8: 
+            rospy.loginfo("PATROL_MODE")
+            # self.patrol()    
+        # detected enemybot
+        else:
+            rospy.loginfo("ESCAPR_MODE")
+            self.canselGoal()
+            self.escape()
 
     # Respect seigot
     def detect_enemylocation(self):
         # data management
-        time_width = 0.5
+        time_width = 0.1
         counter_width = 3
-        time_diff = rospy.Time.now().to_sec() - self.enemy_position.header.stamp.to_sec()
-        time_diff = rospy.Time.now().to_sec()
-        if time_diff > time_width:
-            self.detect_counter = 0
-            return False, 0.0, 0.0
-        else:
-            self.detect_counter = self.detect_counter+1
-            if self.detect_counter < counter_width:
-                return False, 0.0, 0.0
+        # time_diff = rospy.Time.now().to_sec() - self.enemy_position.header.stamp.to_sec()
+        # if time_diff > time_width:
+        #     self.detect_counter = 0
+        #     rospy.loginfo("is here")
+        #     return False, 0.0, 0.0
+        # else:
+            # self.detect_counter = self.detect_counter+1
+            # if self.detect_counter < counter_width:
+            #     rospy.loginfo("is here")
+            #     return False, 0.0, 0.0
 
         # set frame
         # map_frame = self.robot_namespace+"map"
         # link_frame = self.robot_namespace+"base_link"
+        rospy.loginfo("here is")
         map_frame = "map"
         link_frame = "base_link"
         
         # get self position
-        valid, trans, rot = self.listen_connechbot_pose(map_frame, link_frame)
+        valid, trans, rot = self.listen_selflocation(map_frame, link_frame)
         if valid == False:
+            rospy.loginfo("Here tf False")
             return False, 0.0, 0.0
-        
+
         # Calculating the distance from enemybot 
         dx = self.enemy_position.pose.pose.position.x - trans[0]
         dy = self.enemy_position.pose.pose.position.y - trans[1]
         distance = math.sqrt( pow(dx, 2) + pow(dy, 2) )
-        rospy.loginfo("enemy_position_x: {}".format(self.enemy_position.pose.pose.position.x))
-        rospy.loginfo("enemy_position_y: {}".format(self.enemy_position.pose.pose.position.y))
-
+        
         # Calculating the direction from enemybot
         direction = math.atan2(dx, dy)
         roll, pitch, yaw = tf.transformations.euler_from_quaternion(rot)
         direction_diff = direction - yaw
         # direction_diff = angles.normalize_angle( direction - yaw )
 
+        rospy.loginfo("distance: {}".format(distance))
+        rospy.loginfo("direction_deff: {}".format(direction_diff))
         return True, distance, direction_diff
 
     # lidar scan topic call back sample
@@ -231,8 +275,7 @@ if __name__ == '__main__':
     rospy.init_node('connechRun')
     node = ConnechBot()
     bot = ConnechBot(use_lidar=True, use_camera=True, use_imu=True, use_odom=True, use_joint_states=True)
-    # bot.strategy()
     rate = rospy.Rate(30)
     while not rospy.is_shutdown():
-        node.status_judgment()
+        node.task()
         rate.sleep()
