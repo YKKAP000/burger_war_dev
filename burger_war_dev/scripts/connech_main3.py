@@ -30,7 +30,7 @@ from camera import processImage, showImage
 class ConnechBot():
     def __init__(self, 
                  use_lidar=False, use_camera=False, use_imu=False,
-                 use_odom=False, use_joint_states=False):
+                 use_odom=True, use_joint_states=False):
         
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
@@ -148,15 +148,17 @@ class ConnechBot():
     # Respect seigot
     def detect_enemylocation(self):
         # data management
-        # time_diff = rospy.Time.now().to_sec() - self.enemy_position.header.stamp.to_sec()
-        # time_diff = rospy.Time.now().to_sec()
-        # if time_diff > 0.5:
-        #     self.detect_counter = 0
-        #     return False, 0.0, 0.0
-        # else:
-        #     self.detect_counter = self.detect_counter+1
-        #     if self.detect_counter < self.counter_th:
-        #         return False, 0.0, 0.0
+        time_width = 0.5
+        counter_width = 3
+        time_diff = rospy.Time.now().to_sec() - self.enemy_position.header.stamp.to_sec()
+        time_diff = rospy.Time.now().to_sec()
+        if time_diff > time_width:
+            self.detect_counter = 0
+            return False, 0.0, 0.0
+        else:
+            self.detect_counter = self.detect_counter+1
+            if self.detect_counter < counter_width:
+                return False, 0.0, 0.0
 
         # set frame
         # map_frame = self.robot_namespace+"map"
