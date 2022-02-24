@@ -118,5 +118,5 @@ class SearchEnemy:
 if __name__ == '__main__':
     rospy.init_node('search_enemy')
     ed = SearchEnemy()
-    rospy.loginfo("Enemy Serch Start.")
+    # rospy.loginfo("Enemy Search Start.")
     rospy.spin()

@@ -243,11 +243,22 @@ class ConnechBot():
             in_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             rospy.logerr(e)
-        out_img = processImage(in_img)
-        # self.image_pub.publish(self.bridge.cv2_to_imgmsg(out_img, 'mono8'))
+
+        # color detection
+        self.yellow_flag, yellow_img = processImage(in_img, "yellow")
+        self.blue_flag, blue_img = processImage(in_img, "blue")
+        self.green_flag, green_img = processImage(in_img, "green")
+        self.red_flag, red_img = processImage(in_img, "red")
+        #rospy.loginfo("yellow: {}".format(self.yellow_flag))
+        #rospy.loginfo("blue: {}".format(self.blue_flag))
+        #rospy.loginfo("green: {}".format(self.green_flag))
+        #rospy.loginfo("red: {}".format(self.red_flag))
 
         # Show processed image on a Window
-        showImage(out_img)
+        showImage(yellow_img)
+        #showImage(blue_img)
+        #showImage(green_img)
+        #showImage(red_img)
 
     # imu call back sample
     # update imu state

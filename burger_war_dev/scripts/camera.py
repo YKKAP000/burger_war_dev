@@ -27,18 +27,19 @@ def processImage(frame, color):
     if num_labels == 0:
         return False, out_img
     
-    for index in range(num_labels):
-        x = stats[index][0]
-        y = stats[index][1]
-        w = stats[index][2]
-        h = stats[index][3]
-        s = stats[index][4]
-        mx = int(center[index][0])
-        my = int(center[index][1])
-        #print("(x,y)=%d,%d (w,h)=%d,%d s=%d (mx,my)=%d,%d"%(x, y, w, h, s, mx, my) )
+    x = stats[0][0]
+    y = stats[0][1]
+    w = stats[0][2]
+    h = stats[0][3]
+    s = stats[0][4]
+    mx = int(center[0][0])
+    my = int(center[0][1])
+    # print("(x,y)=%d,%d (w,h)=%d,%d s=%d (mx,my)=%d,%d"%(x, y, w, h, s, mx, my) )
 
-        cv2.rectangle(out_img, (x, y), (x+w, y+h), (255, 0, 255))
-
+    if color == "yellow" and (my < 250 or w < 200):
+        return False, out_img
+        
+    cv2.rectangle(out_img, (x, y), (x+w, y+h), (255, 0, 255))
     return True, out_img
 
 def detectYellowColor(frame):
