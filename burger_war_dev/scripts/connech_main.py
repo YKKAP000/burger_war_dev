@@ -116,6 +116,8 @@ class ConnechBot():
         r = rospy.Rate(5) # change speed 5fps
 
         if self.escape_pointID == -1:
+            if self.goal_pointID == len(self.goals) - 1:     
+                self.goal_pointID = 0           # reset self.goal_pointID
             goal = self.goal_pointID
             self.goal_pointID = self.goal_pointID + 1
         else:
@@ -126,20 +128,19 @@ class ConnechBot():
 
     def escape(self):
         escape_goals = self.setEscapepoint()
+        rospy.loginfo(self.goals[escape_goals])
         self.setGoal(self.goals[escape_goals])
 
     def setEscapepoint(self):
-        enemy_x = self.enemy_info[0]
-        enemy_y = self.enemy_info[1]
-        enemy_angle = self.enemy_info[2]
-
-        # enemy_x = self.enemy_position.pose.pose.position.x
-        # enemy_y = self.enemy_position.pose.pose.position.y
+        enemy_x = self.enemy_info[0]            # detecting enemybot x
+        enemy_y = self.enemy_info[1]            # detecting enemybot y
+        enemy_direction = self.enemy_info[2]     # detecting enemybot direction [deg]
         
         # select escape point
-        if   enemy_x > 0 and enemy_y > 0:
+        if   enemy_x > 0 and enemy_y > 0: 
             rospy.loginfo("escape point1")
             self.escape_pointID = 1
+
         elif enemy_x < 0 and enemy_y > 0:
             rospy.loginfo("escape point2")
             self.escape_pointID = 18
@@ -203,11 +204,12 @@ class ConnechBot():
         direction_diff = direction - yaw                        # radians
         deg_direction_diff = (direction - yaw)*180/3.14159      # radians to degree
 
-        self.enemy_info = [dx, dy, deg_direction_diff]          # set enemybot imformation     
+        self.enemy_info = [dx, dy, direction]          # set enemybot imformation     
 
         rospy.loginfo("distance: {}".format(distance))
-        rospy.loginfo("direction_deff: {}".format(direction_diff))
-        rospy.loginfo("deg_direction_diff: {}".format(deg_direction_diff))
+        rospy.loginfo("direction: {}".format(direction))
+        # rospy.loginfo("direction_deff: {}".format(direction_diff))
+        # rospy.loginfo("deg_direction_diff: {}".format(deg_direction_diff))
         return True, distance, direction_diff
 
     # lidar scan topic call back sample
@@ -278,13 +280,14 @@ class ConnechBot():
         self.enemy_position = position
         # rospy.loginfo("enemypos_x: {}".format(self.enemy_position.pose.pose.position.x))
         # rospy.loginfo("enemypos_y: {}".format(self.enemy_position.pose.pose.position.y))
+        self.set_status()
 
     def set_status(self):
         # get enemy_detector result
         state, distance, direction_deff = self.detect_enemy()
 
         # non-detecting enemybot
-        if distance > 0.8: 
+        if distance > 0.5: 
             rospy.loginfo("PATROL_MODE")
             self.patrol()    
         # detected enemybot
