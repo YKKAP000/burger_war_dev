@@ -40,7 +40,7 @@ def processImage(frame, color):
         # print("(x,y)=%d,%d (w,h)=%d,%d s=%d (mx,my)=%d,%d"%(x, y, w, h, s, mx, my) )
 
     print("s=%d, y_mean=%d"%(s, np.mean(my)))
-    if color == "yellow" and (s < 25000 or np.mean(my) < 250):
+    if color == "yellow" and (s < 10000 or np.mean(my) < 250):
         return False, out_img
         
     cv2.rectangle(out_img, (x, y), (x+w, y+h), (255, 0, 255))
