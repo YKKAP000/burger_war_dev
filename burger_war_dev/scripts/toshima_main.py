@@ -38,7 +38,6 @@ class ConnechBot():
         
         self.goals = get_goallist(self)
 
-        self.yellow_flag = False
         self.yellow_detected = False
 
         # velocity publisher
@@ -233,9 +232,6 @@ class ConnechBot():
     # camera image call back sample
     # comvert image topic to opencv object and show
     def imageCallback(self, data):
-        if not self.yellow_flag and self.yellow_detected:
-            self.yellow_detected = False
-
         try:
             in_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
@@ -243,28 +239,30 @@ class ConnechBot():
 
         # color detection
         self.yellow_flag, yellow_img = processImage(in_img, "yellow")
-        self.blue_flag, blue_img = processImage(in_img, "blue")
-        self.green_flag, green_img = processImage(in_img, "green")
-        self.red_flag, red_img = processImage(in_img, "red")
-        rospy.loginfo("YELLOW: {}".format(self.yellow_flag))
-        #rospy.loginfo("blue: {}".format(self.blue_flag))
-        #rospy.loginfo("green: {}".format(self.green_flag))
-        #rospy.loginfo("red: {}".format(self.red_flag))
+        # self.blue_flag, blue_img = processImage(in_img, "blue")
+        # self.green_flag, green_img = processImage(in_img, "green")
+        # self.red_flag, red_img = processImage(in_img, "red")
+        # rospy.loginfo("YELLOW: {}".format(self.yellow_flag))
+        # rospy.loginfo("blue: {}".format(self.blue_flag))
+        # rospy.loginfo("green: {}".format(self.green_flag))
+        # rospy.loginfo("red: {}".format(self.red_flag))
 
         # Show processed image on a Window
         showImage(yellow_img)
-        #showImage(blue_img)
-        #showImage(green_img)
-        #showImage(red_img)
+        # showImage(blue_img)
+        # showImage(green_img)
+        # showImage(red_img)
 
-        # if self.yellow_flag:
-        #     if not self.yellow_detected:
-        #         print("YELLOW IS DETECTED!!!")
-        #         self.client.cancel_all_goals()
-        #         self.yellow_detected = True
-        #     twist = Twist()
-        #     twist.angular.z = -10
-        #     self.vel_pub.publish(twist)
+        if self.yellow_flag:
+            print("YELLOW IS DETECTED!!!")
+            if not self.yellow_detected:
+                self.client.cancel_all_goals()
+                self.yellow_detected = True
+            twist = Twist()
+            twist.angular.z = -10
+            self.vel_pub.publish(twist)
+        else:
+            self.yellow_detected = False
 
     # imu call back sample
     # update imu state
