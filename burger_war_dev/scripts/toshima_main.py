@@ -181,11 +181,11 @@ class ConnechBot():
 
         # non-detecting enemybot
         if distance > 0.8: 
-            rospy.loginfo("PATROL_MODE")
-            # self.patrol()    
+            # rospy.loginfo("PATROL_MODE")
+            self.patrol()    
         # detected enemybot
         else:
-            rospy.loginfo("ESCAPE_MODE")
+            # rospy.loginfo("ESCAPE_MODE")
             self.canselGoal()
             self.escape()
 
