@@ -33,7 +33,7 @@ class ConnechBot():
                  use_odom=True, use_joint_states=False):
 
         def get_goallist(self):
-            goalpoints = readCsv(os.path.dirname(__file__) + "/input/strategy3.csv")
+            goalpoints = readCsv(os.path.dirname(__file__) + "/input/strategy2.csv")
             return goalpoints
         
         self.goals = get_goallist(self)
